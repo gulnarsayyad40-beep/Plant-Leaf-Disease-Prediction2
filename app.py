@@ -6,10 +6,12 @@ import os
 
 app = Flask(__name__)
 
-MODEL_PATH = "model_cnn.keras"
+MODEL_PATH = "model_tf"
 
-model = tf.keras.models.load_model(MODEL_PATH, compile=False)
-
+model = tf.keras.models.load_model(
+    MODEL_PATH,
+    compile=False
+)
 
 class_names = [
     "Potato Healthy",

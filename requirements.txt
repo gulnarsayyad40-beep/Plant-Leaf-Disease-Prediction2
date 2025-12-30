@@ -1,5 +1,4 @@
-tensorflow==2.13.0
-keras==2.13.1
-Flask==2.2.5
-Pillow
-numpy<2
+tensorflow==2.12.0
+flask
+numpy
+pillows

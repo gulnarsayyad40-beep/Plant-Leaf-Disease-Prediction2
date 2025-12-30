@@ -10,7 +10,8 @@ import os
 IMG_SIZE = (128, 128)
 BATCH_SIZE = 32
 EPOCHS = 10
-MODEL_PATH = os.path.join(os.path.dirname(__file__), "model_cnn.keras")
+
+MODEL_PATH = os.path.join(os.path.dirname(__file__), "model_tf")
 
 # -------------------------
 # TRAIN MODEL FUNCTION
@@ -47,7 +48,7 @@ def train_model():
 
     # CNN Model
     model = Sequential([
-        tf.keras.layers.Input(shape=(128, 128, 3)),
+        tf.keras.layers.InputLayer(input_shape=(128, 128, 3)),
 
         Conv2D(32, 3, activation='relu'),
         MaxPooling2D(),
@@ -75,8 +76,7 @@ def train_model():
     )
 
     # Save model
-    model.save(MODEL_PATH,
-    include_optimizer=False)
+    model.save(MODEL_PATH)
     print("✅ Model trained and saved as", MODEL_PATH)
 
 # -------------------------
