@@ -1,6 +1,6 @@
 import tensorflow as tf
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Conv2D, MaxPooling2D, Dense, GlobalAveragePooling2D
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, Dense, GlobalAveragePooling2D, Dropout
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 import os
 
@@ -9,7 +9,7 @@ import os
 # -------------------------
 IMG_SIZE = (128, 128)
 BATCH_SIZE = 32
-EPOCHS = 10
+EPOCHS = 25    # increase epochs for better learning
 
 MODEL_PATH = os.path.join(os.path.dirname(__file__), "model_tf")
 
@@ -26,8 +26,20 @@ def train_model():
             "Dataset not found! Make sure 'dataset/train' and 'dataset/val' exist locally."
         )
 
-    # Image generators
-    train_gen = ImageDataGenerator(rescale=1./255)
+    # -------------------------
+    # Image generators with augmentation
+    # -------------------------
+    train_gen = ImageDataGenerator(
+        rescale=1./255,
+        rotation_range=20,
+        width_shift_range=0.1,
+        height_shift_range=0.1,
+        shear_range=0.1,
+        zoom_range=0.1,
+        horizontal_flip=True,
+        fill_mode='nearest'
+    )
+    
     val_gen = ImageDataGenerator(rescale=1./255)
 
     train_data = train_gen.flow_from_directory(
@@ -46,9 +58,11 @@ def train_model():
 
     num_classes = train_data.num_classes
 
+    # -------------------------
     # CNN Model
+    # -------------------------
     model = Sequential([
-        tf.keras.layers.InputLayer(input_shape=(128, 128, 3)),
+        tf.keras.layers.Input(shape=(128, 128, 3)),
 
         Conv2D(32, 3, activation='relu'),
         MaxPooling2D(),
@@ -56,27 +70,37 @@ def train_model():
         Conv2D(64, 3, activation='relu'),
         MaxPooling2D(),
 
+        Conv2D(128, 3, activation='relu'),
+        MaxPooling2D(),
+        Dropout(0.3),   # prevent overfitting
+
         GlobalAveragePooling2D(),
         Dense(128, activation='relu'),
         Dense(num_classes, activation='softmax')
     ])
 
+    # -------------------------
     # Compile model
+    # -------------------------
     model.compile(
         optimizer='adam',
         loss='categorical_crossentropy',
         metrics=['accuracy']
     )
 
+    # -------------------------
     # Train model
+    # -------------------------
     model.fit(
         train_data,
         validation_data=val_data,
         epochs=EPOCHS
     )
 
+    # -------------------------
     # Save model
-    model.save(MODEL_PATH)
+    # -------------------------
+    model.save(MODEL_PATH, include_optimizer=False)
     print("✅ Model trained and saved as", MODEL_PATH)
 
 # -------------------------
