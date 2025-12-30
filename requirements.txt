@@ -1,5 +1,5 @@
 tensorflow==2.13.0
 keras==2.13.1
-Flask
+Flask==2.2.5
 Pillow
-numpy
+numpy<2
